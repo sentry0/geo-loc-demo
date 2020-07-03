@@ -69,9 +69,12 @@ public class CityController {
 
 	@GetMapping("/cities")
 	@Async("asyncExecutor")
-	public CompletableFuture<List<City>> getNearbyCities(@RequestParam("latitude") double latitude,
-			@RequestParam("longitude") double longitude, @RequestParam("distance") int distance,
-			@RequestParam("unit") String unit, HttpServletResponse response) {
+	public CompletableFuture<List<City>> getNearbyCities(
+			@RequestParam("latitude") double latitude,
+			@RequestParam("longitude") double longitude, 
+			@RequestParam("distance") int distance,
+			@RequestParam("unit") String unit, 
+			HttpServletResponse response) {
 		if (latitude < LocationService.MIN_LATITUDE) {
 			latitude = LocationService.MIN_LATITUDE;
 		} else if (latitude > LocationService.MAX_LATITUDE) {
@@ -95,8 +98,7 @@ public class CityController {
 		final int dist = distance;
 		final String unt = unit;
 
-		CompletableFuture<ConsumptionProbe> limitCheck = this.bucket.asAsync()
-				.tryConsumeAndReturnRemaining(TOKENS_CONSUMED_PER_REQUEST);
+		CompletableFuture<ConsumptionProbe> limitCheck = this.bucket.asAsync().tryConsumeAndReturnRemaining(TOKENS_CONSUMED_PER_REQUEST);
 
 		return limitCheck.thenCompose(probe -> {
 			if (!probe.isConsumed()) {
