@@ -1,2 +1,21 @@
 # geo-loc-demo
-A geospacial microservice demo
+A geospacial microservice demo created with Spring Boot
+
+## Pre-requisites
+
+1. A DB with geospacial capabilities, I recomend PostGIS
+2. Create a blank DB (the app will handle everything else)
+
+## Setup
+Open the application-local.properties file and change lines 21-23 so that you can connect to your database.
+
+## Running the App
+The quickest way to run this demo is to import it into the [Spring Tool Suite](https://spring.io/tools) and run it there.  You can also run it via the command line if you dont like or don't have use the Spring Tool Suit.
+
+In either case make sure you set your profile to "local" in order for the proper properties file to be applied.
+
+## Tests
+Nothing here just yet :P
+
+## Attribution
+The geographic data used for this demo was sourced from the [World City Database](https://simplemaps.com/data/world-cities).  Thank you for your work and free offering.
