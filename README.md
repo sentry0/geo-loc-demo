@@ -14,6 +14,8 @@ The quickest way to run this demo is to import it into the [Spring Tool Suite](h
 
 In either case make sure you set your profile to "local" in order for the proper properties file to be applied.
 
+Once running hit http://localhost:8080/cities?latitude=43.45&longitude=-80.5&distance=150&unit=km with your chosen REST client or browser to play with the app.
+
 ## Tests
 Nothing here just yet :P
 
