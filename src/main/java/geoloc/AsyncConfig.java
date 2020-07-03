@@ -29,25 +29,25 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class AsyncConfig {
 	@Value("${async.core.pool.size}")
 	private int corePoolSize;
-	
+
 	@Value("${async.max.pool.size}")
 	private int maxPoolSize;
-	
+
 	@Value("${async.queue.capacity}")
-	private int queueCapacity;	
-	
+	private int queueCapacity;
+
 	@Value("${async.thread.prefix}")
 	private String threadPrefix;
-	
-    @Bean(name = "asyncExecutor")
-    public Executor asyncExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePoolSize);
-        executor.setMaxPoolSize(maxPoolSize);
-        executor.setQueueCapacity(queueCapacity);
-        executor.setThreadNamePrefix(threadPrefix);
-        executor.initialize();
-        
-        return executor;
-    }
+
+	@Bean(name = "asyncExecutor")
+	public Executor asyncExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(corePoolSize);
+		executor.setMaxPoolSize(maxPoolSize);
+		executor.setQueueCapacity(queueCapacity);
+		executor.setThreadNamePrefix(threadPrefix);
+		executor.initialize();
+
+		return executor;
+	}
 }
