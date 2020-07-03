@@ -106,7 +106,7 @@ public class CityController {
 			List<City> cities = new ArrayList<City>();
 
 			try {
-				cities = locationService.findNearbyCities(lat, lng, dist, unt);
+				cities.addAll(locationService.findNearbyCities(lat, lng, dist, unt));
 			} catch (ParseException e) {
 				// Do nothing
 			}
