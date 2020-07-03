@@ -24,24 +24,29 @@ import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.ConsumptionProbe;
 import io.github.bucket4j.Refill;
 
+// Copyright 2020-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 /**
- * Copyright 2020-Present Philip J. Guinchard
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * Note this <strong>IS NOT</strong> a typical Spring controller as it is configured for rate limiting and 
+ * asynchronous responses.  For a more typical controller I would suggest you reference the docs  
+ * <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#getting-started-cli-example">
+ * here
+ * </a>
  * 
  * @author Philip J. Guinchard
  */
-
 @RestController
 public class CityController {
 	private static final int MAX_REQUESTS = 100;
