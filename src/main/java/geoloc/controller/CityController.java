@@ -1,9 +1,14 @@
 package geoloc.controller;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,6 +18,11 @@ import com.vividsolutions.jts.io.ParseException;
 
 import geoloc.domain.City;
 import geoloc.service.LocationService;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Bucket4j;
+import io.github.bucket4j.ConsumptionProbe;
+import io.github.bucket4j.Refill;
 
 /**
 * Copyright 2020-Present Philip J. Guinchard
@@ -33,9 +43,23 @@ import geoloc.service.LocationService;
 */
 
 @RestController
-public class CityController {	
+public class CityController {
+	private static final int MAX_REQUESTS = 100;
+	
+	private static final int REFILL_MINUTES = 5;
+	
+	private static final int TOKENS_CONSUMED_PER_REQUEST = 1;
+	
+	private Bucket bucket = null;
+	
 	@Autowired
 	private LocationService locationService;
+	
+	public CityController() {
+        Bandwidth limit = Bandwidth.classic(MAX_REQUESTS, Refill.greedy(MAX_REQUESTS, Duration.ofMinutes(REFILL_MINUTES)));
+        
+        this.bucket = Bucket4j.builder().addLimit(limit).build();
+	}
 	
 	@GetMapping("/cities")
 	@Async("asyncExecutor")
@@ -43,7 +67,8 @@ public class CityController {
 			@RequestParam("latitude") double latitude, 
 			@RequestParam("longitude") double longitude,
 			@RequestParam("distance") int distance,
-			@RequestParam("unit") String unit
+			@RequestParam("unit") String unit,
+			HttpServletResponse response
 			) throws ParseException {
 		if (latitude < LocationService.MIN_LATITUDE) {
 			latitude = LocationService.MIN_LATITUDE;
@@ -63,6 +88,34 @@ public class CityController {
 			distance = LocationService.MIN_DISTANCE;
 		}
 		
-		return CompletableFuture.completedFuture(locationService.findNearbyCities(latitude, longitude, distance, unit));
+		final double lat = latitude;
+		final double lng = longitude;
+		final int dist = distance;
+		final String unt = unit;
+		
+		CompletableFuture<ConsumptionProbe> limitCheck = this.bucket.asAsync().tryConsumeAndReturnRemaining(TOKENS_CONSUMED_PER_REQUEST);
+		
+		return limitCheck.thenCompose(probe -> {
+			if (!probe.isConsumed()) {
+				return CompletableFuture.completedFuture(null);
+			} else {
+				List<City> cities = new ArrayList<City>();
+				
+				try {
+					cities = locationService.findNearbyCities(lat, lng, dist, unt);
+				} catch (ParseException e) {
+					// Do nothing
+				}
+				
+				return CompletableFuture.completedFuture(cities);
+			}
+		}).whenComplete((result, exception) -> {
+			if (result == null) {
+                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+                response.setHeader("X-Rate-Limit-Retry-After-Seconds", String.valueOf(REFILL_MINUTES * 60));
+			}
+			
+			return;
+		});
 	}
 }
