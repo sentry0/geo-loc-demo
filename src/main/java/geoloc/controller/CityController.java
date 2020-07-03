@@ -71,7 +71,7 @@ public class CityController {
 	@Async("asyncExecutor")
 	public CompletableFuture<List<City>> getNearbyCities(@RequestParam("latitude") double latitude,
 			@RequestParam("longitude") double longitude, @RequestParam("distance") int distance,
-			@RequestParam("unit") String unit, HttpServletResponse response) throws ParseException {
+			@RequestParam("unit") String unit, HttpServletResponse response) {
 		if (latitude < LocationService.MIN_LATITUDE) {
 			latitude = LocationService.MIN_LATITUDE;
 		} else if (latitude > LocationService.MAX_LATITUDE) {
@@ -86,7 +86,7 @@ public class CityController {
 
 		if (distance > LocationService.MAX_DISTANCE) {
 			distance = LocationService.MAX_DISTANCE;
-		} else if (distance <= 0) {
+		} else if (distance <= LocationService.MIN_DISTANCE) {
 			distance = LocationService.MIN_DISTANCE;
 		}
 
@@ -101,24 +101,22 @@ public class CityController {
 		return limitCheck.thenCompose(probe -> {
 			if (!probe.isConsumed()) {
 				return CompletableFuture.completedFuture(null);
-			} else {
-				List<City> cities = new ArrayList<City>();
-
-				try {
-					cities = locationService.findNearbyCities(lat, lng, dist, unt);
-				} catch (ParseException e) {
-					// Do nothing
-				}
-
-				return CompletableFuture.completedFuture(cities);
 			}
+			
+			List<City> cities = new ArrayList<City>();
+
+			try {
+				cities = locationService.findNearbyCities(lat, lng, dist, unt);
+			} catch (ParseException e) {
+				// Do nothing
+			}
+
+			return CompletableFuture.completedFuture(cities);
 		}).whenComplete((result, exception) -> {
 			if (result == null) {
 				response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
 				response.setHeader("X-Rate-Limit-Retry-After-Seconds", String.valueOf(REFILL_MINUTES * 60));
 			}
-
-			return;
 		});
 	}
 }
