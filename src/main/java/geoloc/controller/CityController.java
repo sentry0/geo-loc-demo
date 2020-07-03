@@ -61,8 +61,7 @@ public class CityController {
 	private LocationService locationService;
 
 	public CityController() {
-		Bandwidth limit = Bandwidth.classic(MAX_REQUESTS,
-				Refill.greedy(MAX_REQUESTS, Duration.ofMinutes(REFILL_MINUTES)));
+		Bandwidth limit = Bandwidth.classic(MAX_REQUESTS, Refill.greedy(MAX_REQUESTS, Duration.ofMinutes(REFILL_MINUTES)));
 
 		this.bucket = Bucket4j.builder().addLimit(limit).build();
 	}
