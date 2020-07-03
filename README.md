@@ -1,4 +1,4 @@
-w# geo-loc-demo
+# geo-loc-demo
 A geospacial microservice demo created with Spring Boot
 
 ## Running - The Easy Way
@@ -15,7 +15,7 @@ Have docker and java 8+ installed
 
 ### Pre-requisites
 
-1. A DB with geospacial capabilities, I recomend PostGIS
+1. A DB with geospacial capabilities, I recommend PostGIS
 2. Create a blank DB (the app will handle everything else)
 
 ### Setup
