@@ -10,6 +10,8 @@ Have docker and java 8+ installed
 ### Running The App
 
 	sudo ./run.sh
+	
+Once running hit http://localhost:8080/cities?latitude=43.45&longitude=-80.5&distance=150&unit=km with your chosen REST client or browser to play with the app.
 
 ## Running - The Complicated Way
 
