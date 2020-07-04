@@ -18,6 +18,8 @@ PROFILE="local"
 
 POSTGIS_PREFIX="geoloc"
 
+CONTAINER_NAME=${POSTGIS_PREFIX}demo-postgis
+
 REGEX="^${POSTGIS_PREFIX}demo-postgis$"
 
 PARAMS=""
@@ -56,13 +58,17 @@ done
 # set positional arguments in their proper place
 eval set -- "$PARAMS"
 
-if ! docker ps --format '{{.Names}}' | egrep $REGEX &> /dev/null; then
-    docker run --name ${POSTGIS_PREFIX}demo-postgis \
+if ! docker ps -a --format '{{.Names}}' | egrep $REGEX &> /dev/null; then
+    docker run --name $CONTAINER_NAME \
         -p 6501:5432 \
         -e POSTGRES_USER=$POSTGIS_PREFIX \
         -e POSTGRES_PASSWORD=$POSTGIS_PREFIX \
         -d \
         postgis/postgis
+elif docker ps -a -f name=$CONTAINER_NAME --format '{{.Status}}' | egrep '^Up.*\(Paused\)$' &> /dev/null; then
+    docker unpause $CONTAINER_NAME
+elif ! docker ps -a -f name=$CONTAINER_NAME --format '{{.Status}}' | egrep '^Up.*$' &> /dev/null; then
+    docker restart $CONTAINER_NAME
 fi
 
 if [ ! -d "target" ] || [ -z "$(ls -A target)" ] || [ $INSTALL == 1 ]; then
@@ -74,5 +80,9 @@ if [ $RUN_TESTS == 1 ] || [ $TESTS_ONLY == 1 ]; then
 fi
 
 if [ $TESTS_ONLY == 0 ]; then
-    ./mvnw spring-boot:run -Dspring-boot.run.profiles=$PROFILE
+    if lsof -i -P -n | egrep '\*:8080 \(LISTEN\)' &> /dev/null; then
+        echo "Something is already listening on port 8080"
+    else
+        ./mvnw spring-boot:run -Dspring-boot.run.profiles=$PROFILE
+    fi
 fi
