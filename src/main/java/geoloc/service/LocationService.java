@@ -46,11 +46,11 @@ public class LocationService {
 	
 	private static final String UNIT_MILE = "m";
 	
-	private static double KM_PER_POINT_OF_LONGITUDE = 111.0;
+	private static final double KM_PER_POINT_OF_LONGITUDE = 111.0D;
 	
-	private static double MILES_PER_POINT_OF_LONGITUDE = 69.0;
+	private static final double MILES_PER_POINT_OF_LONGITUDE = 69.0D;
 	
-	private static final double PRECISION = 1000d;
+	private static final double PRECISION = 1000.0D;
 	
 	@Autowired
 	private CityRepository cityRepo;
@@ -75,7 +75,7 @@ public class LocationService {
 	}
 
 	private double getDegreeFromDistance(int distance, String unit) {
-		double degree = 0D;
+		double degree = 0.0D;
 				
 		if (unit.equalsIgnoreCase(UNIT_MILE)) {
 			degree = distance / MILES_PER_POINT_OF_LONGITUDE;
